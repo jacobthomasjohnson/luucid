@@ -1,4 +1,4 @@
-# Lucent
+# Luucid
 
 A modern, clean, minimal meditation timer built with Next.js (App Router) and JavaScript.
 
@@ -13,7 +13,7 @@ Open http://localhost:3000
 
 ## Audio files
 
-Lucent expects local audio assets in these folders:
+Luucid expects local audio assets in these folders:
 
 	- `rain.mp3`
 	- `ocean.mp3`
@@ -26,7 +26,7 @@ If an audio file is missing, the app still works and shows "Audio unavailable" w
 
 ### Add your own sounds (no code changes)
 
-Lucent auto-discovers audio files by scanning the folders below on the server:
+Luucid auto-discovers audio files by scanning the folders below on the server:
 
 - `public/audio/background/`
 - `public/audio/bells/`
@@ -36,7 +36,7 @@ To add new sounds:
 1. Drop audio files into those folders (supported: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`).
 2. Refresh the app.
 
-Lucent uses the filename as the ID and generates a label from it. Example:
+Luucid uses the filename as the ID and generates a label from it. Example:
 
 - `public/audio/background/forest-rain.mp3` → shows as “Forest Rain”
 
@@ -49,7 +49,7 @@ Note: if you deploy to a host like Vercel, you still need to include the new fil
 
 ### Seamless looping
 
-Lucent uses Web Audio’s `AudioBufferSourceNode.loop`, which is sample-accurate. For a truly seamless loop, the *audio file itself* must be loopable (no awkward tail, click, or silence).
+Luucid uses Web Audio’s `AudioBufferSourceNode.loop`, which is sample-accurate. For a truly seamless loop, the *audio file itself* must be loopable (no awkward tail, click, or silence).
 
 Best results:
 
@@ -66,11 +66,11 @@ Example:
 
 - `"beach-waves": { "start": 2.4, "end": 38.9 }`
 
-If `end` is `0` (the default in the sample file), Lucent won’t apply loop points and will loop the entire decoded buffer.
+If `end` is `0` (the default in the sample file), Luucid won’t apply loop points and will loop the entire decoded buffer.
 
 ### Preloading (reduce first-click delay)
 
-Lucent can preload audio by fetching and decoding files into the Web Audio buffer cache before you press Play/Begin.
+Luucid can preload audio by fetching and decoding files into the Web Audio buffer cache before you press Play/Begin.
 
 - Backgrounds preload when you enter the Sound step.
 - Bells preload when you enter any bell-related step.
@@ -79,7 +79,7 @@ This reduces the “first click” delay, but it does download audio files in th
 
 ### Set icons for sounds (no code changes)
 
-Lucent supports an optional mapping file:
+Luucid supports an optional mapping file:
 
 - `public/audio/icons.json`
 
@@ -91,7 +91,7 @@ Example:
 - Add to `public/audio/icons.json`:
 	- `"beach-waves": "Waves"`
 
-If an icon name isn’t recognized, Lucent falls back to a simple default icon.
+If an icon name isn’t recognized, Luucid falls back to a simple default icon.
 
 ## Autoplay restrictions
 
@@ -102,7 +102,7 @@ Mobile browsers typically block audio until you interact with the page.
 
 ## Stateless behavior
 
-Lucent is anonymous and stateless.
+Luucid is anonymous and stateless.
 
 - No accounts
 - No saving
@@ -111,4 +111,4 @@ Lucent is anonymous and stateless.
 ## Development notes
 
 - Central audio logic lives in `lib/audioEngine.js`
-- Session state is managed by Zustand in `store/useLucentStore.js`
+- Session state is managed by Zustand in `store/useLuucidStore.js`

@@ -103,7 +103,7 @@ export default function VolumeControls({
   previewBell,
 }) {
   return (
-    <div className="mx-auto w-full max-w-xl grid grid-cols-1 gap-8 sm:grid-cols-2">
+    <div className="mx-auto w-full max-w-xl space-y-8">
       <SliderRow
         label="Background volume"
         value={backgroundVolume}

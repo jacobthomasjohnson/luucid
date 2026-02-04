@@ -20,22 +20,25 @@ import IntervalControls from "../components/IntervalControls";
 import VolumeControls from "../components/VolumeControls";
 import PrimaryButton from "../components/PrimaryButton";
 import Toast from "../components/Toast";
-import { useLucentStore } from "../store/useLucentStore";
+import { useLuucidStore } from "../store/useLuucidStore";
 
 export default function Home() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
+
+  const shellRef = useRef(null);
 
   const contentShellRef = useRef(null);
   const measureRefs = useRef({});
   const [measureWidth, setMeasureWidth] = useState(0);
   const [contentMinHeight, setContentMinHeight] = useState(0);
 
-  const config = useLucentStore((s) => s.config);
-  const audioCatalog = useLucentStore((s) => s.audioCatalog);
-  const preview = useLucentStore((s) => s.preview);
-  const toast = useLucentStore((s) => s.toast);
-  const actions = useLucentStore((s) => s.actions);
+  const config = useLuucidStore((s) => s.config);
+  const audioCatalog = useLuucidStore((s) => s.audioCatalog);
+  const preview = useLuucidStore((s) => s.preview);
+  const toast = useLuucidStore((s) => s.toast);
+  const actions = useLuucidStore((s) => s.actions);
+  const shellMinHeight = useLuucidStore((s) => s.ui?.shellMinHeight || 0);
 
   async function onBegin() {
     const result = await actions.beginSession();
@@ -59,11 +62,12 @@ export default function Home() {
   const StepIcon = step.Icon;
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === steps.length - 1;
+  const shouldCenterStep = step.key === "duration" || step.key === "intervals" || step.key === "volume" || step.key === "ready";
 
   function renderStepBody(key) {
     if (key === "duration") {
       return (
-        <div className="w-full max-w-sm">
+        <div className="mx-auto w-full max-w-sm">
           <DurationPicker valueMinutes={config.durationMinutes} onChange={actions.setDurationMinutes} mode="minimal" />
         </div>
       );
@@ -71,7 +75,7 @@ export default function Home() {
 
     if (key === "sound") {
       return (
-        <div className="w-full max-w-3xl">
+        <div className="mx-auto w-full max-w-3xl">
           <SoundGrid
             selectedId={config.backgroundId}
             onSelect={actions.setBackground}
@@ -85,7 +89,7 @@ export default function Home() {
 
     if (key === "startBell") {
       return (
-        <div className="w-full max-w-3xl">
+        <div className="mx-auto w-full max-w-3xl">
           <BellPicker
             label="Start bell"
             valueId={config.startBellId}
@@ -99,7 +103,7 @@ export default function Home() {
 
     if (key === "endBell") {
       return (
-        <div className="w-full max-w-3xl">
+        <div className="mx-auto w-full max-w-3xl">
           <BellPicker
             label="End bell"
             valueId={config.endBellId}
@@ -152,7 +156,7 @@ export default function Home() {
 
     if (key === "ready") {
       return (
-        <div className="w-full max-w-xl rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-zinc-100">
+        <div className="mx-auto w-full max-w-xl rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-zinc-100">
           <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-zinc-500">Duration</dt>
@@ -219,8 +223,15 @@ export default function Home() {
       if (h > maxH) maxH = h;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (maxH > 0) setContentMinHeight(Math.ceil(maxH));
   }, [measureWidth, steps, audioCatalog.backgrounds?.length, audioCatalog.bells?.length, config.intervalEnabled]);
+
+  useLayoutEffect(() => {
+    if (!contentMinHeight) return;
+    const h = shellRef.current?.getBoundingClientRect?.().height || 0;
+    if (h > 0) actions.setShellMinHeight(h);
+  }, [actions, contentMinHeight]);
 
   useEffect(() => {
     if (step.key !== "sound") actions.stopPreview();
@@ -249,11 +260,15 @@ export default function Home() {
   return (
     <div className="min-h-dvh overflow-hidden bg-linear-to-b from-zinc-50 to-white p-6 sm:p-10 flex items-center justify-center">
       <div className="mx-auto w-full max-w-3xl">
-        <div className="relative w-full max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-4rem)] flex flex-col">
+        <div
+          ref={shellRef}
+          style={shellMinHeight ? { minHeight: shellMinHeight } : undefined}
+          className="relative w-full max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-4rem)] flex flex-col"
+        >
           <div className="px-6 py-6 sm:px-8 flex items-center justify-center">
             <Image
               src="/logo.svg"
-              alt="Lucent"
+              alt="Luucid"
               width={120}
               height={28}
               priority
@@ -261,19 +276,23 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-8 sm:px-8">
-            <div ref={contentShellRef} className="w-full flex items-center justify-center">
+          <div className="px-6 pt-1 pb-6 sm:px-8 flex flex-col items-center justify-center gap-2">
+            <StepIcon className="h-9 w-9 text-zinc-900" aria-hidden="true" />
+            <div className="text-xs font-medium tracking-wide text-zinc-500">{step.title}</div>
+          </div>
+
+          <div className="flex-1 px-6 pt-2 pb-8 sm:px-8 flex flex-col">
+            <div
+              ref={contentShellRef}
+              className={`w-full flex-1 flex justify-center ${
+                shouldCenterStep ? "items-center" : "items-start overflow-y-auto overflow-x-hidden luucid-scroll-gutter"
+              }`}
+            >
               <div
                 style={contentMinHeight ? { minHeight: contentMinHeight } : undefined}
-                className="w-full flex items-center justify-center"
+                className={`w-full flex flex-col items-center ${shouldCenterStep ? "justify-center" : "justify-start"}`}
               >
-                <div
-                  key={step.key}
-                  className="w-full flex flex-col items-center justify-center gap-10 animate-[lucentStepIn_220ms_ease-out]"
-                >
-                  <div className="flex items-center justify-center" aria-hidden="true">
-                    <StepIcon className="h-10 w-10 text-zinc-900" />
-                  </div>
+                <div key={step.key} className="w-full animate-[luucidStepIn_220ms_ease-out]">
                   {renderStepBody(step.key)}
                 </div>
               </div>
@@ -286,18 +305,14 @@ export default function Home() {
                 style={{ width: measureWidth }}
               >
                 {steps.map((s) => {
-                  const Icon = s.Icon;
                   return (
                     <div
                       key={s.key}
                       ref={(el) => {
                         if (el) measureRefs.current[s.key] = el;
                       }}
-                      className="w-full flex flex-col items-center justify-center gap-10"
+                      className="w-full"
                     >
-                      <div className="flex items-center justify-center" aria-hidden="true">
-                        <Icon className="h-10 w-10 text-zinc-900" />
-                      </div>
                       {renderStepBody(s.key)}
                     </div>
                   );

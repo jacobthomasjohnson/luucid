@@ -19,7 +19,7 @@ export default function DurationPicker({ valueMinutes, onChange, mode = "full" }
     const v = clampMinutes(valueMinutes);
 
     return (
-      <div className="flex flex-col items-center justify-center gap-8 py-10">
+      <div className="flex flex-col items-center justify-center gap-6 py-4">
         <div className="text-6xl font-semibold tabular-nums tracking-tight text-zinc-900" aria-label={`Duration ${v} minutes`}>
           {v}
         </div>

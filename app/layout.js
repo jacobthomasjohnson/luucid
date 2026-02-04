@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Lucent",
+  title: "Luucid",
   description: "A clean, minimal meditation timer.",
 };
 

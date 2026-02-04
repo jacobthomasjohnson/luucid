@@ -26,14 +26,12 @@ body {
     Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
-@keyframes lucentStepIn {
+@keyframes luucidStepIn {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
@@ -45,13 +43,17 @@ body {
   outline: none;
 }
 
-.lucent-gradient-border {
+.luucid-gradient-border {
   border: 3px solid transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
     linear-gradient(45deg, #fb7185, #60a5fa, #34d399, #fbbf24) border-box;
 }
 
-.lucent-border-frame {
+.luucid-border-frame {
   border: 3px solid transparent;
+}
+
+.luucid-scroll-gutter {
+  scrollbar-gutter: stable;
 }

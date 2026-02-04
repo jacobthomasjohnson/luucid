@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { useLucentStore } from "../store/useLucentStore";
+import { useLuucidStore } from "../store/useLuucidStore";
 
 export default function AudioCatalogLoader() {
-  const setAudioCatalog = useLucentStore((s) => s.actions.setAudioCatalog);
+  const setAudioCatalog = useLuucidStore((s) => s.actions.setAudioCatalog);
 
   useEffect(() => {
     let cancelled = false;

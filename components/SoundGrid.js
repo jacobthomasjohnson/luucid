@@ -74,10 +74,10 @@ export default function SoundGrid({
                   activate();
                 }
               }}
-              className={`group w-full rounded-2xl px-4 py-4 text-left ring-1 transition-[transform,box-shadow,background-color] duration-200 ease-out hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+              className={`group w-full rounded-2xl px-4 py-4 text-left ring-1 ring-inset transition-[transform,box-shadow,background-color] duration-200 ease-out active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
                 selected
-                  ? "lucent-gradient-border ring-0 scale-[1.01]"
-                  : "lucent-border-frame bg-white/60 ring-zinc-100 hover:bg-white hover:ring-zinc-300"
+                  ? "luucid-gradient-border ring-0"
+                  : "luucid-border-frame bg-white/60 ring-zinc-100 hover:bg-white hover:ring-zinc-300"
               }`}
               aria-pressed={selected}
             >
@@ -90,7 +90,6 @@ export default function SoundGrid({
                       />
                       <div className="text-sm font-medium text-zinc-900 truncate">{bg.label}</div>
                     </div>
-                    <div className="mt-1 text-xs text-zinc-500">Loop</div>
                   </div>
 
                   <div
@@ -102,12 +101,6 @@ export default function SoundGrid({
                     Playing
                   </div>
                 </div>
-
-                {selected ? (
-                  <div className="mt-3 text-xs font-semibold text-zinc-900">Selected</div>
-                ) : (
-                  <div className="mt-3 text-xs text-zinc-500">Tap to select</div>
-                )}
             </div>
           </div>
         );

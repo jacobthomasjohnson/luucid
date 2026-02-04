@@ -27,7 +27,7 @@ function shouldPlayIntervalBell({ intervalEnabled, intervalSeconds, durationSeco
 
 const WARMUP_SECONDS = 60;
 
-export const useLucentStore = create((set, get) => ({
+export const useLuucidStore = create((set, get) => ({
   toast: {
     open: false,
     message: "",
@@ -46,6 +46,10 @@ export const useLucentStore = create((set, get) => ({
   preload: {
     backgrounds: false,
     bells: false,
+  },
+
+  ui: {
+    shellMinHeight: 0,
   },
 
   config: {
@@ -81,6 +85,17 @@ export const useLucentStore = create((set, get) => ({
   },
 
   actions: {
+    setShellMinHeight(height) {
+      const h = Math.max(0, Math.ceil(Number(height) || 0));
+      if (!h) return;
+      set((s) => ({
+        ui: {
+          ...(s.ui || {}),
+          shellMinHeight: Math.max(Number(s.ui?.shellMinHeight) || 0, h),
+        },
+      }));
+    },
+
     stopPreview() {
       getAudioEngine().stopPreview({ fadeOutSeconds: 0.2 });
       set({ preview: { kind: null, id: null } });
@@ -96,7 +111,6 @@ export const useLucentStore = create((set, get) => ({
           while (pending.length) {
             const task = pending.shift();
             try {
-              // eslint-disable-next-line no-await-in-loop
               await task();
             } catch {
               // ignore
@@ -303,9 +317,8 @@ export const useLucentStore = create((set, get) => ({
       audio.setBackgroundVolume(config.backgroundVolume);
       audio.setBellVolume(config.bellVolume);
 
-      const background = config.backgroundId === "none"
-        ? null
-        : getBackgroundById(config.backgroundId, audioCatalog.backgrounds);
+      const background =
+        config.backgroundId === "none" ? null : getBackgroundById(config.backgroundId, audioCatalog.backgrounds);
       const startBell = getBellById(config.startBellId, audioCatalog.bells);
       const endBell = getBellById(config.endBellId, audioCatalog.bells);
 
@@ -431,6 +444,58 @@ export const useLucentStore = create((set, get) => ({
       }));
       getAudioEngine().stopAll();
       set({ preview: { kind: null, id: null } });
+    },
+
+    async skipWarmup() {
+      const { runtime, config } = get();
+      if (runtime.status === "idle" || runtime.status === "complete") return { ok: false };
+      if (runtime.mode !== "warmup") return { ok: true };
+
+      const t = nowMs();
+      const durationSeconds = runtime.durationSeconds;
+      const intervalSeconds = minutesToSeconds(config.intervalMinutes);
+
+      set((s) => ({
+        runtime: {
+          ...s.runtime,
+          status: "running",
+          mode: "session",
+          startedAtMs: t,
+          pausedAtMs: 0,
+          pausedTotalMs: 0,
+          lastTickMs: t,
+          remainingSeconds: durationSeconds,
+          intervalSeconds,
+          nextIntervalAtSeconds: intervalSeconds,
+        },
+      }));
+
+      const audio = getAudioEngine();
+      audio.setBackgroundVolume(config.backgroundVolume);
+      audio.setBellVolume(config.bellVolume);
+
+      const sessionAudio = get()._sessionAudio;
+      if (sessionAudio?.backgroundSrc) {
+        audio
+          .startBackground({
+            src: sessionAudio.backgroundSrc,
+            loop: true,
+            fadeInSeconds: DEFAULTS.fadeInSeconds,
+            loopStart: sessionAudio.backgroundLoopStart ?? null,
+            loopEnd: sessionAudio.backgroundLoopEnd ?? null,
+          })
+          .then((r) => {
+            if (!r.ok) get().actions.showToast("Audio unavailable");
+          });
+      }
+
+      if (sessionAudio?.startBellSrc) {
+        audio.playBell({ src: sessionAudio.startBellSrc }).then((r) => {
+          if (!r.ok) get().actions.showToast("Audio unavailable");
+        });
+      }
+
+      return { ok: true };
     },
 
     tick() {

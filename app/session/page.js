@@ -8,7 +8,7 @@ import TimerDisplay from "../../components/TimerDisplay";
 import PrimaryButton from "../../components/PrimaryButton";
 import Toast from "../../components/Toast";
 
-import { useLucentStore } from "../../store/useLucentStore";
+import { useLuucidStore } from "../../store/useLuucidStore";
 import { getBackgroundById } from "../../lib/constants";
 
 function Body({ bgLabel, intervalText, runtime }) {
@@ -39,11 +39,14 @@ function Body({ bgLabel, intervalText, runtime }) {
 export default function SessionPage() {
   const router = useRouter();
 
-  const config = useLucentStore((s) => s.config);
-  const audioCatalog = useLucentStore((s) => s.audioCatalog);
-  const runtime = useLucentStore((s) => s.runtime);
-  const toast = useLucentStore((s) => s.toast);
-  const actions = useLucentStore((s) => s.actions);
+  const shellRef = useRef(null);
+
+  const config = useLuucidStore((s) => s.config);
+  const audioCatalog = useLuucidStore((s) => s.audioCatalog);
+  const runtime = useLuucidStore((s) => s.runtime);
+  const toast = useLuucidStore((s) => s.toast);
+  const actions = useLuucidStore((s) => s.actions);
+  const shellMinHeight = useLuucidStore((s) => s.ui?.shellMinHeight || 0);
 
   const rafRef = useRef(0);
   const intervalRef = useRef(0);
@@ -105,6 +108,8 @@ export default function SessionPage() {
   const intervalText = intervalLabel();
   const bgLabel = bg.label;
 
+  const showSkipWarmup = runtime.status !== "idle" && runtime.status !== "complete" && runtime.mode === "warmup";
+
   useLayoutEffect(() => {
     function updateWidth() {
       const w = contentShellRef.current?.getBoundingClientRect?.().width || 0;
@@ -123,17 +128,28 @@ export default function SessionPage() {
     const h1 = activeEl?.getBoundingClientRect?.().height || activeEl?.offsetHeight || 0;
     const h2 = completeEl?.getBoundingClientRect?.().height || completeEl?.offsetHeight || 0;
     const maxH = Math.max(h1, h2);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (maxH > 0) setContentMinHeight(Math.ceil(maxH));
   }, [measureWidth, bgLabel, intervalText]);
 
   const viewKey = runtime.status === "complete" ? "complete" : "active";
 
+  useLayoutEffect(() => {
+    if (!contentMinHeight) return;
+    const h = shellRef.current?.getBoundingClientRect?.().height || 0;
+    if (h > 0) actions.setShellMinHeight(h);
+  }, [actions, contentMinHeight, viewKey]);
+
   return (
     <div className="min-h-dvh overflow-hidden bg-linear-to-b from-zinc-50 to-white p-6 sm:p-10 flex items-center justify-center">
       <div className="mx-auto w-full max-w-3xl">
-        <div className="relative w-full max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-4rem)] flex flex-col">
+        <div
+          ref={shellRef}
+          style={shellMinHeight ? { minHeight: shellMinHeight } : undefined}
+          className="relative w-full max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-4rem)] flex flex-col"
+        >
           <div className="px-6 py-6 sm:px-8 flex items-center justify-center">
-            <Image src="/logo.svg" alt="Lucent" width={120} height={28} priority className="h-7 w-auto" />
+            <Image src="/logo.svg" alt="Luucid" width={120} height={28} priority className="h-7 w-auto" />
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 py-8 sm:px-8">
@@ -144,7 +160,7 @@ export default function SessionPage() {
               >
                 <div
                   key={viewKey}
-                  className="w-full flex items-center justify-center animate-[lucentStepIn_220ms_ease-out]"
+                  className="w-full flex items-center justify-center animate-[luucidStepIn_220ms_ease-out]"
                 >
                   <Body bgLabel={bgLabel} intervalText={intervalText} runtime={runtime} />
                 </div>
@@ -184,9 +200,9 @@ export default function SessionPage() {
           </div>
 
           <div className="px-6 pb-6 sm:px-8 flex items-center justify-center">
-            <div className="w-full max-w-sm flex items-center gap-3">
+            <div className="w-full max-w-sm">
               {runtime.status === "complete" ? (
-                <>
+                <div className="flex items-center gap-3">
                   <PrimaryButton type="button" className="flex-1" onClick={onRestart}>
                     Restart
                   </PrimaryButton>
@@ -201,27 +217,35 @@ export default function SessionPage() {
                   >
                     Exit
                   </PrimaryButton>
-                </>
+                </div>
               ) : (
-                <>
-                  {runtime.status === "paused" ? (
-                    <PrimaryButton type="button" variant="white" className="flex-1" onClick={() => actions.resume()}>
-                      Play
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    {runtime.status === "paused" ? (
+                      <PrimaryButton type="button" variant="white" className="flex-1" onClick={() => actions.resume()}>
+                        Play
+                      </PrimaryButton>
+                    ) : (
+                      <PrimaryButton type="button" variant="white" className="flex-1" onClick={() => actions.pause()}>
+                        Pause
+                      </PrimaryButton>
+                    )}
+                    <PrimaryButton
+                      type="button"
+                      variant="danger"
+                      className="flex-1"
+                      onClick={() => actions.endSession({ completedNaturally: false })}
+                    >
+                      End session
                     </PrimaryButton>
-                  ) : (
-                    <PrimaryButton type="button" variant="white" className="flex-1" onClick={() => actions.pause()}>
-                      Pause
+                  </div>
+
+                  {showSkipWarmup ? (
+                    <PrimaryButton type="button" variant="secondary" className="w-full" onClick={() => actions.skipWarmup()}>
+                      Skip warm up
                     </PrimaryButton>
-                  )}
-                  <PrimaryButton
-                    type="button"
-                    variant="danger"
-                    className="flex-1"
-                    onClick={() => actions.endSession({ completedNaturally: false })}
-                  >
-                    End session
-                  </PrimaryButton>
-                </>
+                  ) : null}
+                </div>
               )}
             </div>
           </div>

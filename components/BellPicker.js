@@ -53,11 +53,6 @@ export default function BellPicker({ label, valueId, onChange, onPreview, bells 
 
   return (
     <div className="space-y-4">
-      <div className="text-center">
-        <div className="text-sm font-medium text-zinc-900">{label}</div>
-        <div className="mt-1 text-xs text-zinc-500">Tap a bell to select + preview</div>
-      </div>
-
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3" role="group" aria-label={`${label} options`}>
         {items.map((bell) => {
           const selected = bell.id === valueId;
@@ -76,10 +71,10 @@ export default function BellPicker({ label, valueId, onChange, onPreview, bells 
                   activate(bell.id);
                 }
               }}
-              className={`group w-full rounded-2xl px-4 py-4 text-left ring-1 transition-[transform,box-shadow,background-color] duration-200 ease-out hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+              className={`group w-full rounded-2xl px-4 py-4 text-left ring-1 ring-inset transition-[transform,box-shadow,background-color] duration-200 ease-out active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
                 selected
-                  ? "lucent-gradient-border ring-0 scale-[1.01]"
-                  : "lucent-border-frame bg-white/60 ring-zinc-100 hover:bg-white hover:ring-zinc-300"
+                  ? "luucid-gradient-border ring-0"
+                  : "luucid-border-frame bg-white/60 ring-zinc-100 hover:bg-white hover:ring-zinc-300"
               }`}
               aria-pressed={selected}
             >
@@ -92,7 +87,6 @@ export default function BellPicker({ label, valueId, onChange, onPreview, bells 
                     />
                     <div className="text-sm font-medium text-zinc-900 truncate">{bell.label}</div>
                   </div>
-                  <div className="mt-1 text-xs text-zinc-500">Bell</div>
                 </div>
 
                 <div
@@ -104,12 +98,6 @@ export default function BellPicker({ label, valueId, onChange, onPreview, bells 
                   Playing
                 </div>
               </div>
-
-              {selected ? (
-                <div className="mt-3 text-xs font-semibold text-zinc-900">Selected</div>
-              ) : (
-                <div className="mt-3 text-xs text-zinc-500">Tap to select</div>
-              )}
             </div>
           );
         })}
