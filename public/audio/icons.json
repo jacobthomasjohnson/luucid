@@ -1,23 +1,20 @@
 {
   "background": {
-    "beach-waves": "Waves",
-    "rainforest": "Leaf",
-    "rainy-night": "CloudRain",
-    "mountaintop": "Mountain",
-    "coffee-shop": "Coffee",
-
-    "ocean": "Waves",
-    "rain": "CloudRain",
-    "white-noise": "Wind",
-
-    "wind": "Wind",
+    "coffee": "Coffee",
     "fire": "Flame",
-    "fireplace": "Flame",
-    "night": "Moon"
+    "night": "Moon",
+    "ocean": "Waves",
+    "rainforest": "Leaf",
+    "rainy": "CloudRain",
+    "relax": "Moon",
+    "smooth": "Sparkles",
+    "wind": "Wind"
   },
   "bells": {
-    "soft-bell": "Bell",
-    "deep-bell": "Bell",
-    "bright-bell": "Bell"
+    "bright": "Bell",
+    "deep": "Bell",
+    "high": "Bell",
+    "mid": "Bell",
+    "soft": "Bell"
   }
 }

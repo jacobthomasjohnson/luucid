@@ -45,10 +45,10 @@ function SliderRow({
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-zinc-900">{label}</div>
-          <div className="text-xs text-zinc-500">{helpText}</div>
+          <div className="text-sm font-medium text-(--luucid-text)">{label}</div>
+          <div className="text-xs text-(--luucid-muted)">{helpText}</div>
         </div>
-        <div className="text-sm font-medium tabular-nums text-zinc-900" aria-label={`${label} ${percent} percent`}>
+        <div className="text-sm font-medium tabular-nums text-(--luucid-text)" aria-label={`${label} ${percent} percent`}>
           {percent}%
         </div>
       </div>

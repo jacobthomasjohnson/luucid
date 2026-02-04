@@ -11,9 +11,9 @@
       "loopEnd": null
     },
     {
-      "id": "coffee-shop",
-      "label": "Coffee Shop",
-      "src": "/audio/background/Coffee%20Shop.wav",
+      "id": "coffee",
+      "label": "Coffee",
+      "src": "/audio/background/Coffee.wav",
       "loop": true,
       "icon": "Coffee",
       "loopStart": null,
@@ -25,15 +25,6 @@
       "src": "/audio/background/Fire.wav",
       "loop": true,
       "icon": "Flame",
-      "loopStart": null,
-      "loopEnd": null
-    },
-    {
-      "id": "mountaintop",
-      "label": "Mountaintop",
-      "src": "/audio/background/Mountaintop.wav",
-      "loop": true,
-      "icon": "Mountain",
       "loopStart": null,
       "loopEnd": null
     },
@@ -65,11 +56,29 @@
       "loopEnd": null
     },
     {
-      "id": "rainy-night",
-      "label": "Rainy Night",
-      "src": "/audio/background/Rainy%20Night.wav",
+      "id": "rainy",
+      "label": "Rainy",
+      "src": "/audio/background/Rainy.wav",
       "loop": true,
       "icon": "CloudRain",
+      "loopStart": null,
+      "loopEnd": null
+    },
+    {
+      "id": "relax",
+      "label": "Relax",
+      "src": "/audio/background/Relax.wav",
+      "loop": true,
+      "icon": "Moon",
+      "loopStart": null,
+      "loopEnd": null
+    },
+    {
+      "id": "smooth",
+      "label": "Smooth",
+      "src": "/audio/background/Smooth.wav",
+      "loop": true,
+      "icon": "Sparkles",
       "loopStart": null,
       "loopEnd": null
     },
@@ -85,21 +94,33 @@
   ],
   "bells": [
     {
-      "id": "bright-bell",
-      "label": "Bright Bell",
-      "src": "/audio/bells/Bright%20Bell.wav",
+      "id": "bright",
+      "label": "Bright",
+      "src": "/audio/bells/Bright.wav",
       "icon": "Bell"
     },
     {
-      "id": "deep-bell",
-      "label": "Deep Bell",
-      "src": "/audio/bells/Deep%20Bell.wav",
+      "id": "deep",
+      "label": "Deep",
+      "src": "/audio/bells/Deep.wav",
       "icon": "Bell"
     },
     {
-      "id": "soft-bell",
-      "label": "Soft Bell",
-      "src": "/audio/bells/Soft%20Bell.wav",
+      "id": "high",
+      "label": "High",
+      "src": "/audio/bells/High.wav",
+      "icon": "Bell"
+    },
+    {
+      "id": "mid",
+      "label": "Mid",
+      "src": "/audio/bells/Mid.wav",
+      "icon": "Bell"
+    },
+    {
+      "id": "soft",
+      "label": "Soft",
+      "src": "/audio/bells/Soft.wav",
       "icon": "Bell"
     }
   ]

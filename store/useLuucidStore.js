@@ -166,7 +166,7 @@ export const useLuucidStore = create((set, get) => ({
 
     resetAll() {
       const audio = getAudioEngine();
-      audio.stopAll();
+      audio.stopAll({ fadeOutBackgroundSeconds: 0.35, fadeOutBellsSeconds: 0.35, fadeOutPreviewSeconds: 0.2 });
       audio.setBackgroundVolume(DEFAULTS.backgroundVolume);
       audio.setBellVolume(DEFAULTS.bellVolume);
 
@@ -312,6 +312,7 @@ export const useLuucidStore = create((set, get) => ({
       }
 
       const audio = getAudioEngine();
+      await audio.unlock();
       audio.stopPreview({ fadeOutSeconds: 0.15 });
       set({ preview: { kind: null, id: null } });
       audio.setBackgroundVolume(config.backgroundVolume);
@@ -378,6 +379,8 @@ export const useLuucidStore = create((set, get) => ({
       const { runtime } = get();
       if (runtime.status !== "paused") return;
 
+      await getAudioEngine().unlock();
+
       const t = nowMs();
       const pausedDelta = runtime.pausedAtMs ? t - runtime.pausedAtMs : 0;
 
@@ -409,8 +412,14 @@ export const useLuucidStore = create((set, get) => ({
         if (!bellResult.ok) get().actions.showToast("Audio unavailable");
       }
 
-      // No fade-out controls: stop background immediately.
-      audio.stopAll();
+      if (completedNaturally) {
+        // Let the end bell ring; just fade out the background bed.
+        audio.stopPreview({ fadeOutSeconds: 0.15 });
+        audio.fadeOutAndStopBackground({ fadeOutSeconds: 0.8 });
+      } else {
+        // Ending early: fade out any currently playing bell(s) + background.
+        audio.stopAll({ fadeOutBackgroundSeconds: 0.35, fadeOutBellsSeconds: 0.35, fadeOutPreviewSeconds: 0.15 });
+      }
 
       set((s) => ({
         runtime: {
@@ -442,7 +451,7 @@ export const useLuucidStore = create((set, get) => ({
           completedNaturally: false,
         },
       }));
-      getAudioEngine().stopAll();
+      getAudioEngine().stopAll({ fadeOutBackgroundSeconds: 0.35, fadeOutBellsSeconds: 0.35, fadeOutPreviewSeconds: 0.2 });
       set({ preview: { kind: null, id: null } });
     },
 
@@ -450,6 +459,8 @@ export const useLuucidStore = create((set, get) => ({
       const { runtime, config } = get();
       if (runtime.status === "idle" || runtime.status === "complete") return { ok: false };
       if (runtime.mode !== "warmup") return { ok: true };
+
+      await getAudioEngine().unlock();
 
       const t = nowMs();
       const durationSeconds = runtime.durationSeconds;

@@ -3,6 +3,38 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
+
+  --luucid-bg-top: #fafafa;
+  --luucid-bg-bottom: #ffffff;
+
+  --luucid-text: #0a0a0a;
+  --luucid-muted: #71717a;
+  --luucid-subtle: #3f3f46;
+
+  --luucid-surface-solid: #ffffff;
+  --luucid-surface: rgba(255, 255, 255, 0.92);
+  --luucid-surface-soft: rgba(255, 255, 255, 0.65);
+
+  --luucid-border: rgba(24, 24, 27, 0.12);
+  --luucid-border-strong: rgba(24, 24, 27, 0.22);
+
+  --luucid-accent-bg: #18181b;
+  --luucid-accent-fg: #ffffff;
+  --luucid-accent-hover-bg: #27272a;
+  --luucid-accent-border: transparent;
+  --luucid-accent-hover-border: transparent;
+
+  --luucid-btn-secondary-fg: #3f3f46;
+  --luucid-btn-secondary-hover-bg: rgba(24, 24, 27, 0.06);
+
+  --luucid-btn-white-bg: #ffffff;
+  --luucid-btn-white-fg: #0a0a0a;
+  --luucid-btn-white-hover-bg: #fafafa;
+  --luucid-btn-white-border: rgba(24, 24, 27, 0.12);
+
+  --luucid-btn-danger-bg: rgba(244, 63, 94, 0.10);
+  --luucid-btn-danger-fg: #be123c;
+  --luucid-btn-danger-hover-bg: rgba(244, 63, 94, 0.16);
 }
 
 @theme inline {
@@ -19,9 +51,50 @@
   }
 }
 
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
+  --luucid-bg-top: #09090b;
+  --luucid-bg-bottom: #000000;
+
+  --luucid-text: #f4f4f5;
+  --luucid-muted: #a1a1aa;
+  --luucid-subtle: #d4d4d8;
+
+  --luucid-surface-solid: #0b0b0d;
+  --luucid-surface: rgba(24, 24, 27, 0.88);
+  --luucid-surface-soft: rgba(24, 24, 27, 0.60);
+
+  --luucid-border: rgba(244, 244, 245, 0.14);
+  --luucid-border-strong: rgba(244, 244, 245, 0.24);
+
+  /* Outline-style primary button in dark mode */
+  --luucid-accent-bg: transparent;
+  --luucid-accent-fg: #ffffff;
+  --luucid-accent-hover-bg: rgba(244, 244, 245, 0.08);
+  --luucid-accent-border: rgba(244, 244, 245, 0.28);
+  --luucid-accent-hover-border: rgba(244, 244, 245, 0.36);
+
+  --luucid-btn-secondary-fg: #e4e4e7;
+  --luucid-btn-secondary-hover-bg: rgba(244, 244, 245, 0.10);
+
+  /* "White" buttons become outlined too */
+  --luucid-btn-white-bg: transparent;
+  --luucid-btn-white-fg: #ffffff;
+  --luucid-btn-white-hover-bg: rgba(244, 244, 245, 0.08);
+  --luucid-btn-white-border: rgba(244, 244, 245, 0.24);
+
+  --luucid-btn-danger-bg: rgba(244, 63, 94, 0.20);
+  --luucid-btn-danger-fg: #fecdd3;
+  --luucid-btn-danger-hover-bg: rgba(244, 63, 94, 0.28);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: linear-gradient(to bottom, var(--luucid-bg-top), var(--luucid-bg-bottom));
+  color: var(--luucid-text);
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI,
     Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
@@ -46,7 +119,7 @@ body {
 .luucid-gradient-border {
   border: 3px solid transparent;
   background:
-    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(var(--luucid-surface-solid), var(--luucid-surface-solid)) padding-box,
     linear-gradient(45deg, #fb7185, #60a5fa, #34d399, #fbbf24) border-box;
 }
 
@@ -56,4 +129,28 @@ body {
 
 .luucid-scroll-gutter {
   scrollbar-gutter: stable;
+}
+
+.luucid-logo {
+  display: block;
+}
+
+.luucid-logo--dark {
+  display: none;
+}
+
+html[data-theme="dark"] .luucid-logo--light {
+  display: none;
+}
+
+html[data-theme="dark"] .luucid-logo--dark {
+  display: block;
+}
+
+.luucid-fade-top {
+  background: linear-gradient(to bottom, var(--luucid-bg-top), transparent);
+}
+
+.luucid-fade-bottom {
+  background: linear-gradient(to top, var(--luucid-bg-bottom), transparent);
 }

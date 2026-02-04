@@ -105,7 +105,6 @@ Mobile browsers typically block audio until you interact with the page.
 Luucid is anonymous and stateless.
 
 - No accounts
-- No saving
 - Refreshing the page resets the session
 
 ## Development notes

@@ -1,9 +1,13 @@
 {
   "background": {
-    "beach-waves": { "start": 0, "end": 0 },
+    "coffee": { "start": 0, "end": 0 },
+    "fire": { "start": 0, "end": 0 },
+    "night": { "start": 0, "end": 0 },
+    "ocean": { "start": 0, "end": 0 },
     "rainforest": { "start": 0, "end": 0 },
-    "rainy-night": { "start": 0, "end": 0 },
-    "mountaintop": { "start": 0, "end": 0 },
-    "coffee-shop": { "start": 0, "end": 0 }
+    "rainy": { "start": 0, "end": 0 },
+    "relax": { "start": 0, "end": 0 },
+    "smooth": { "start": 0, "end": 0 },
+    "wind": { "start": 0, "end": 0 }
   }
 }

@@ -25,6 +25,13 @@ function toLabelFromFilename(filename) {
     .join(" ");
 }
 
+function stripTrailingBellWord(label) {
+  const s = String(label || "").trim();
+  if (!s) return s;
+  // Remove a trailing "Bell" / "Bells" word (common in filename-based labels).
+  return s.replace(/\s+bells?$/i, "").trim();
+}
+
 async function readJsonIfExists(filePath) {
   try {
     const raw = await fs.readFile(filePath, "utf8");
@@ -120,7 +127,7 @@ async function main() {
 
     return {
       id,
-      label: toLabelFromFilename(filename),
+      label: stripTrailingBellWord(toLabelFromFilename(filename)),
       src: toPublicSrc("/audio/bells", filename),
       icon,
     };
@@ -130,7 +137,6 @@ async function main() {
   const payload = { ok: true, backgrounds, bells };
   await fs.writeFile(outPath, JSON.stringify(payload, null, 2) + "\n", "utf8");
 
-  // eslint-disable-next-line no-console
   console.log(`Generated ${path.relative(root, outPath)} (backgrounds: ${backgrounds.length}, bells: ${bells.length})`);
 }
 

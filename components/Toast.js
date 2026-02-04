@@ -20,13 +20,13 @@ export default function Toast({ open, message, onClose }) {
       aria-live="polite"
       className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
     >
-      <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
+      <div className="w-full max-w-sm rounded-xl border border-(--luucid-border) bg-(--luucid-surface) px-4 py-3 shadow-lg backdrop-blur">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-sm text-zinc-900">{message}</p>
+          <p className="text-sm text-(--luucid-text)">{message}</p>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md px-2 py-1 text-sm text-zinc-600 hover:bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="rounded-md px-2 py-1 text-sm text-(--luucid-muted) hover:bg-(--luucid-btn-secondary-hover-bg) focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
             aria-label="Dismiss"
           >
             Close

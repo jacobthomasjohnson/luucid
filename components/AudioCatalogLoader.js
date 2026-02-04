@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useLuucidStore } from "../store/useLuucidStore";
+import { getAudioEngine } from "../lib/audioEngine";
 
 export default function AudioCatalogLoader() {
   const setAudioCatalog = useLuucidStore((s) => s.actions.setAudioCatalog);
@@ -31,6 +32,27 @@ export default function AudioCatalogLoader() {
       cancelled = true;
     };
   }, [setAudioCatalog]);
+
+  useEffect(() => {
+    const audio = getAudioEngine();
+
+    function tryUnlock() {
+      // Fire-and-forget: unlock attempts are best-effort.
+      audio.unlock();
+    }
+
+    // iOS/Safari generally requires a direct user gesture before audio can play.
+    // Use a few common interaction events to unlock ASAP.
+    window.addEventListener("pointerdown", tryUnlock, { passive: true, once: true });
+    window.addEventListener("touchstart", tryUnlock, { passive: true, once: true });
+    window.addEventListener("keydown", tryUnlock, { passive: true, once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", tryUnlock);
+      window.removeEventListener("touchstart", tryUnlock);
+      window.removeEventListener("keydown", tryUnlock);
+    };
+  }, []);
 
   return null;
 }
