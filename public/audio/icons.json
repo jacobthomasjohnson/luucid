@@ -1,0 +1,23 @@
+{
+  "background": {
+    "beach-waves": "Waves",
+    "rainforest": "Leaf",
+    "rainy-night": "CloudRain",
+    "mountaintop": "Mountain",
+    "coffee-shop": "Coffee",
+
+    "ocean": "Waves",
+    "rain": "CloudRain",
+    "white-noise": "Wind",
+
+    "wind": "Wind",
+    "fire": "Flame",
+    "fireplace": "Flame",
+    "night": "Moon"
+  },
+  "bells": {
+    "bell-soft": "Bell",
+    "bell-deep": "Bell",
+    "bell-bright": "Bell"
+  }
+}

@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Lucent
 
-## Getting Started
+A modern, clean, minimal meditation timer built with Next.js (App Router) and JavaScript.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Audio files
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Lucent expects local audio assets in these folders:
 
-## Learn More
+	- `rain.mp3`
+	- `ocean.mp3`
+	- `white-noise.mp3`
+	- `bell-soft.mp3`
+	- `bell-deep.mp3`
+	- `bell-bright.mp3`
 
-To learn more about Next.js, take a look at the following resources:
+If an audio file is missing, the app still works and shows "Audio unavailable" when playback fails.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Add your own sounds (no code changes)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Lucent auto-discovers audio files by scanning the folders below on the server:
 
-## Deploy on Vercel
+- `public/audio/background/`
+- `public/audio/bells/`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To add new sounds:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Drop audio files into those folders (supported: `.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`).
+2. Refresh the app.
+
+Lucent uses the filename as the ID and generates a label from it. Example:
+
+- `public/audio/background/forest-rain.mp3` → shows as “Forest Rain”
+
+IDs are normalized to a lowercase slug (safe for URLs and mappings). Examples:
+
+- `Coffee Shop.mp3` → id `coffee-shop`
+- `Rainy Night.mp3` → id `rainy-night`
+
+Note: if you deploy to a host like Vercel, you still need to include the new files in your deployment (e.g., commit and redeploy). This avoids modifying code, but the server must have the files.
+
+### Seamless looping
+
+Lucent uses Web Audio’s `AudioBufferSourceNode.loop`, which is sample-accurate. For a truly seamless loop, the *audio file itself* must be loopable (no awkward tail, click, or silence).
+
+Best results:
+
+- Prefer `.wav` or `.ogg` for looping backgrounds (MP3 can include encoder padding that can sound like a tiny gap).
+- Edit the clip so the end meets the start cleanly (often at a zero-crossing), or use a short crossfade when creating the loop.
+
+Optional: Loop points (no code changes)
+
+You can define loop start/end points in seconds here:
+
+- `public/audio/loops.json`
+
+Example:
+
+- `"beach-waves": { "start": 2.4, "end": 38.9 }`
+
+If `end` is `0` (the default in the sample file), Lucent won’t apply loop points and will loop the entire decoded buffer.
+
+### Preloading (reduce first-click delay)
+
+Lucent can preload audio by fetching and decoding files into the Web Audio buffer cache before you press Play/Begin.
+
+- Backgrounds preload when you enter the Sound step.
+- Bells preload when you enter any bell-related step.
+
+This reduces the “first click” delay, but it does download audio files in the background, so keep file sizes reasonable (especially for mobile users).
+
+### Set icons for sounds (no code changes)
+
+Lucent supports an optional mapping file:
+
+- `public/audio/icons.json`
+
+The audio catalog will attach an `icon` name to any matching sound ID, and the UI will render that Lucide icon when available.
+
+Example:
+
+- `public/audio/background/beach-waves.mp3` has ID `beach-waves`
+- Add to `public/audio/icons.json`:
+	- `"beach-waves": "Waves"`
+
+If an icon name isn’t recognized, Lucent falls back to a simple default icon.
+
+## Autoplay restrictions
+
+Mobile browsers typically block audio until you interact with the page.
+
+- Use Preview or Begin to start audio
+- Audio will not start automatically on page load
+
+## Stateless behavior
+
+Lucent is anonymous and stateless.
+
+- No accounts
+- No saving
+- Refreshing the page resets the session
+
+## Development notes
+
+- Central audio logic lives in `lib/audioEngine.js`
+- Session state is managed by Zustand in `store/useLucentStore.js`
