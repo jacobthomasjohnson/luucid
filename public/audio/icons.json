@@ -16,8 +16,8 @@
     "night": "Moon"
   },
   "bells": {
-    "bell-soft": "Bell",
-    "bell-deep": "Bell",
-    "bell-bright": "Bell"
+    "soft-bell": "Bell",
+    "deep-bell": "Bell",
+    "bright-bell": "Bell"
   }
 }

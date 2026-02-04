@@ -11,7 +11,7 @@ export default function AudioCatalogLoader() {
 
     async function load() {
       try {
-        const res = await fetch("/api/audio-catalog", { cache: "no-store" });
+        const res = await fetch("/audio/catalog.json", { cache: "no-store" });
         if (!res.ok) return;
         const data = await res.json();
         if (!data?.ok) return;
