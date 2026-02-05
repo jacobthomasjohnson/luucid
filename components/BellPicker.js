@@ -73,8 +73,8 @@ export default function BellPicker({ label, valueId, onChange, onPreview, bells 
               }}
               className={`group w-full rounded-2xl px-4 py-4 text-left ring-1 ring-inset transition-[transform,box-shadow,background-color] duration-200 ease-out active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
                 selected
-                  ? "luucid-gradient-border ring-0"
-                  : "luucid-border-frame bg-(--luucid-surface-soft) ring-(--luucid-border) hover:bg-(--luucid-surface) hover:ring-(--luucid-border-strong)"
+                  ? "bg-(--luucid-surface) ring-(--luucid-border-strong)"
+                  : "bg-(--luucid-surface-soft) ring-(--luucid-border) hover:bg-(--luucid-surface) hover:ring-(--luucid-border-strong)"
               }`}
               aria-pressed={selected}
             >
@@ -90,7 +90,7 @@ export default function BellPicker({ label, valueId, onChange, onPreview, bells 
                 </div>
 
                 <div
-                  className={`rounded-full px-3 py-2 text-xs font-medium text-(--luucid-subtle) select-none transition-opacity duration-400 ease-out ${
+                  className={`text-xs font-medium text-(--luucid-muted) select-none transition-opacity duration-400 ease-out ${
                     playing ? "opacity-100" : "opacity-0"
                   }`}
                   aria-hidden={!playing}

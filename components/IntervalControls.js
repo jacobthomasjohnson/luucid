@@ -19,7 +19,7 @@ export default function IntervalControls({
           className={`rounded-full px-4 py-2.5 text-sm transition-all duration-200 ease-out active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
             selectedMinutes === 0
               ? "bg-(--luucid-accent-bg) text-(--luucid-accent-fg)"
-              : "bg-(--luucid-surface-soft) text-(--luucid-subtle) hover:bg-(--luucid-surface) ring-1 ring-(--luucid-border) hover:scale-[1.01]"
+              : "bg-(--luucid-surface-soft) text-(--luucid-subtle) hover:bg-(--luucid-surface) ring-1 ring-(--luucid-border)"
           }`}
           aria-pressed={selectedMinutes === 0}
         >
@@ -39,7 +39,7 @@ export default function IntervalControls({
               className={`rounded-full px-4 py-2.5 text-sm transition-all duration-200 ease-out active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                 selected
                   ? "bg-(--luucid-accent-bg) text-(--luucid-accent-fg)"
-                  : "bg-(--luucid-surface-soft) text-(--luucid-subtle) hover:bg-(--luucid-surface) ring-1 ring-(--luucid-border) hover:scale-[1.01]"
+                  : "bg-(--luucid-surface-soft) text-(--luucid-subtle) hover:bg-(--luucid-surface) ring-1 ring-(--luucid-border)"
               }`}
               aria-pressed={selected}
             >

@@ -119,7 +119,7 @@ export default function DurationPicker({ valueMinutes, onChange, mode = "full" }
         <div className="flex items-center gap-6">
           <button
             type="button"
-            className="flex items-center justify-center h-16 w-16 rounded-full bg-(--luucid-btn-white-bg) shadow-sm ring-1 ring-(--luucid-btn-white-border) text-2xl text-(--luucid-subtle) transition-all duration-200 ease-out hover:bg-(--luucid-btn-white-hover-bg) hover:scale-[1.05] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="flex items-center justify-center h-16 w-16 rounded-full bg-(--luucid-btn-white-bg) shadow-sm ring-1 ring-(--luucid-btn-white-border) text-2xl text-(--luucid-subtle) transition-colors duration-200 ease-out hover:bg-(--luucid-btn-white-hover-bg) active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
             onClick={() => step(-1)}
             aria-label="Decrease duration"
           >
@@ -128,7 +128,7 @@ export default function DurationPicker({ valueMinutes, onChange, mode = "full" }
 
           <button
             type="button"
-            className="h-16 w-16 rounded-full bg-(--luucid-btn-white-bg) shadow-sm ring-1 ring-(--luucid-btn-white-border) text-2xl text-(--luucid-subtle) transition-all duration-200 ease-out hover:bg-(--luucid-btn-white-hover-bg) hover:scale-[1.04] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+            className="h-16 w-16 rounded-full bg-(--luucid-btn-white-bg) shadow-sm ring-1 ring-(--luucid-btn-white-border) text-2xl text-(--luucid-subtle) transition-colors duration-200 ease-out hover:bg-(--luucid-btn-white-hover-bg) active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
             onClick={() => step(1)}
             aria-label="Increase duration"
           >

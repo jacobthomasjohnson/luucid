@@ -1,18 +1,87 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { getAudioEngine } from "../lib/audioEngine";
 
-function SliderRow({
+function clamp01(n) {
+  if (Number.isNaN(n)) return 0;
+  return Math.min(1, Math.max(0, n));
+}
+
+function supportsVibrate() {
+  return typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
+}
+
+function maybeVibrate(ms) {
+  if (!supportsVibrate()) return;
+  try {
+    navigator.vibrate(ms);
+  } catch {
+    // ignore
+  }
+}
+
+function polarToCartesian(cx, cy, r, angleDeg) {
+  const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+  return {
+    x: cx + r * Math.cos(angleRad),
+    y: cy + r * Math.sin(angleRad),
+  };
+}
+
+function describeArc(cx, cy, r, startAngle, endAngle) {
+  const start = polarToCartesian(cx, cy, r, startAngle);
+  const end = polarToCartesian(cx, cy, r, endAngle);
+  const delta = Math.abs(endAngle - startAngle);
+  const largeArcFlag = delta > 180 ? 1 : 0;
+  // Sweep clockwise (increasing angle).
+  const sweepFlag = 1;
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`;
+}
+
+function KnobRow({
   label,
   value,
   onChange,
-  helpText,
   preview,
 }) {
-  const percent = Math.round(Number(value) * 100);
+  const percent = Math.round(clamp01(Number(value)) * 100);
+  const [isDragging, setIsDragging] = useState(false);
   const draggingRef = useRef(false);
+  const startYRef = useRef(0);
+  const startValueRef = useRef(0);
+  const lastHapticAtRef = useRef(0);
+  const lastHapticPercentRef = useRef(percent);
+
+  const angle = useMemo(() => {
+    // Map 0..1 to a friendly knob sweep.
+    const minDeg = -135;
+    const maxDeg = 135;
+    return minDeg + clamp01(Number(value)) * (maxDeg - minDeg);
+  }, [value]);
+
+  const arc = useMemo(() => {
+    const minDeg = -135;
+    const maxDeg = 135;
+    const endDeg = minDeg + clamp01(Number(value)) * (maxDeg - minDeg);
+
+    const cx = 50;
+    const cy = 50;
+    const r = 42;
+
+    const trackPath = describeArc(cx, cy, r, minDeg, maxDeg);
+    const valuePath = describeArc(cx, cy, r, minDeg, endDeg);
+    const startPt = polarToCartesian(cx, cy, r, minDeg);
+    const endPt = polarToCartesian(cx, cy, r, maxDeg);
+
+    return {
+      trackPath,
+      valuePath,
+      startPt,
+      endPt,
+    };
+  }, [value]);
 
   function setPreviewVolume(v) {
     if (!preview?.kind) return;
@@ -41,55 +110,143 @@ function SliderRow({
     getAudioEngine().stopPreview({ fadeOutSeconds: 0.12 });
   }
 
+  function applyNextValue(nextValue, { withPreview = false } = {}) {
+    const v = clamp01(nextValue);
+    onChange(v);
+
+    if (withPreview && draggingRef.current) setPreviewVolume(v);
+
+    const nextPercent = Math.round(v * 100);
+    if (nextPercent !== lastHapticPercentRef.current) {
+      const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+      // Throttle haptics; only on meaningful % changes.
+      if (now - lastHapticAtRef.current > 55) {
+        maybeVibrate(6);
+        lastHapticAtRef.current = now;
+      }
+      lastHapticPercentRef.current = nextPercent;
+    }
+  }
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <div className="text-sm font-medium text-(--luucid-text)">{label}</div>
-          <div className="text-xs text-(--luucid-muted)">{helpText}</div>
-        </div>
-        <div className="text-sm font-medium tabular-nums text-(--luucid-text)" aria-label={`${label} ${percent} percent`}>
-          {percent}%
+    <div className="py-2">
+      <div className="text-sm font-medium text-(--luucid-text) text-center">{label}</div>
+
+      <div className="mt-3 flex items-center justify-center">
+        <div
+          role="slider"
+          tabIndex={0}
+          aria-label={label}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={percent}
+          aria-valuetext={`${percent}%`}
+          onKeyDown={(e) => {
+            const step = e.shiftKey ? 0.05 : 0.02;
+            if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+              e.preventDefault();
+              applyNextValue(Number(value) + step);
+            } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              applyNextValue(Number(value) - step);
+            } else if (e.key === "PageUp") {
+              e.preventDefault();
+              applyNextValue(Number(value) + 0.1);
+            } else if (e.key === "PageDown") {
+              e.preventDefault();
+              applyNextValue(Number(value) - 0.1);
+            } else if (e.key === "Home") {
+              e.preventDefault();
+              applyNextValue(0);
+            } else if (e.key === "End") {
+              e.preventDefault();
+              applyNextValue(1);
+            }
+          }}
+          onPointerDown={(e) => {
+            draggingRef.current = true;
+            setIsDragging(true);
+            startYRef.current = e.clientY;
+            startValueRef.current = clamp01(Number(value));
+
+            try {
+              e.currentTarget.setPointerCapture?.(e.pointerId);
+            } catch {
+              // ignore
+            }
+
+            startPreview();
+            setPreviewVolume(value);
+          }}
+          onPointerMove={(e) => {
+            if (!draggingRef.current) return;
+            // Drag up = louder, down = quieter. Roughly ~220px for full range.
+            const dy = startYRef.current - e.clientY;
+            const sensitivity = 1 / 220;
+            const next = startValueRef.current + dy * sensitivity;
+            applyNextValue(next, { withPreview: true });
+          }}
+          onPointerUp={() => {
+            if (!draggingRef.current) return;
+            draggingRef.current = false;
+            setIsDragging(false);
+            stopPreview();
+          }}
+          onPointerCancel={() => {
+            if (!draggingRef.current) return;
+            draggingRef.current = false;
+            setIsDragging(false);
+            stopPreview();
+          }}
+          onLostPointerCapture={() => {
+            if (!draggingRef.current) return;
+            draggingRef.current = false;
+            setIsDragging(false);
+            stopPreview();
+          }}
+          className={`relative h-24 w-24 select-none rounded-full outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+            isDragging ? "" : ""
+          }`}
+          style={{ touchAction: "none" }}
+        >
+          <svg
+            viewBox="0 0 100 100"
+            className="absolute inset-0"
+            aria-hidden="true"
+          >
+            <path
+              d={arc.trackPath}
+              className="text-(--luucid-muted)"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              opacity="0.45"
+            />
+            <path
+              d={arc.valuePath}
+              className="text-(--luucid-text)"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="6"
+              strokeLinecap="round"
+              opacity="0.9"
+            />
+          </svg>
+
+          <div
+            className="absolute inset-0"
+            aria-hidden="true"
+            style={{ transform: `rotate(${angle}deg)` }}
+          >
+            <div className="absolute left-1/2 top-3 h-5 w-0.75 -translate-x-1/2 rounded-full bg-(--luucid-text) opacity-90" />
+          </div>
+
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+            <div className="text-xs font-semibold tabular-nums text-(--luucid-text)">{percent}</div>
+          </div>
         </div>
       </div>
-      <input
-        type="range"
-        min={0}
-        max={1}
-        step={0.01}
-        value={value}
-        onChange={(e) => {
-          const v = Number(e.target.value);
-          onChange(v);
-          if (draggingRef.current) setPreviewVolume(v);
-        }}
-        onPointerDown={(e) => {
-          draggingRef.current = true;
-          try {
-            e.currentTarget.setPointerCapture?.(e.pointerId);
-          } catch {
-            // ignore
-          }
-          startPreview();
-          setPreviewVolume(value);
-        }}
-        onPointerUp={() => {
-          if (!draggingRef.current) return;
-          draggingRef.current = false;
-          stopPreview();
-        }}
-        onPointerCancel={() => {
-          if (!draggingRef.current) return;
-          draggingRef.current = false;
-          stopPreview();
-        }}
-        onLostPointerCapture={() => {
-          if (!draggingRef.current) return;
-          draggingRef.current = false;
-          stopPreview();
-        }}
-        className="w-full accent-sky-500"
-      />
     </div>
   );
 }
@@ -103,21 +260,21 @@ export default function VolumeControls({
   previewBell,
 }) {
   return (
-    <div className="mx-auto w-full max-w-xl space-y-8">
-      <SliderRow
-        label="Background volume"
-        value={backgroundVolume}
-        onChange={onChangeBackground}
-        helpText="Affects the looping sound"
-        preview={previewBackground}
-      />
-      <SliderRow
-        label="Bell volume"
-        value={bellVolume}
-        onChange={onChangeBell}
-        helpText="Affects start, interval, and end bells"
-        preview={previewBell}
-      />
+    <div className="mx-auto w-full max-w-xl sm:max-w-3xl">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <KnobRow
+          label="Background"
+          value={backgroundVolume}
+          onChange={onChangeBackground}
+          preview={previewBackground}
+        />
+        <KnobRow
+          label="Bell"
+          value={bellVolume}
+          onChange={onChangeBell}
+          preview={previewBell}
+        />
+      </div>
     </div>
   );
 }

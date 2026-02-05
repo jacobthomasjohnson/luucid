@@ -18,7 +18,7 @@ function Body({ bgLabel, intervalText, runtime }) {
     <div className="w-full flex flex-col items-center justify-center gap-10">
       {!isComplete ? (
         <div className="text-center space-y-2">
-          <div className="text-sm font-medium text-(--luucid-subtle)">Session</div>
+          <div className="text-xs font-medium tracking-wide text-(--luucid-muted)">Session</div>
         </div>
       ) : null}
 
